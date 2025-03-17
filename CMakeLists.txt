@@ -11,12 +11,11 @@ FetchContent_Declare(
         GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
         GIT_TAG release-2.32.2
 )
+
+# Make SDL2 available
 FetchContent_MakeAvailable(sdl2)
 
-add_executable(sdl2_exp src/main.cpp)
+# Add the directory where SDL2 provides the CMake config
+set(CMAKE_PREFIX_PATH ${sdl2_SOURCE_DIR}/build/cmake)
 
-# Link the SDL2 library to the executable
-target_link_libraries(sdl2_exp PRIVATE SDL2::SDL2)
-
-# Include the SDL2 headers
-target_include_directories(sdl2_exp PUBLIC ${sdl2_SOURCE_DIR}/include)
+add_subdirectory(src/1_hello_world)
