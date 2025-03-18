@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 constexpr int SCREEN_WIDTH = 640;
 constexpr int SCREEN_HEIGHT = 480;
@@ -12,19 +12,19 @@ constexpr int SCREEN_HEIGHT = 480;
 bool init();
 
 //Loads media
-bool loadMedia();
+bool load_media();
 
 //Frees media and shuts down SDL
 void close();
 
 //Loads individual image
-SDL_Surface *loadSurface(const std::string &path);
+SDL_Surface *load_surface(const std::string &path);
 
 //The window we'll be rendering to
-SDL_Window *gWindow = nullptr;
+SDL_Window *g_window = nullptr;
 
 //The surface contained by the window
-SDL_Surface *gScreenSurface = nullptr;
+SDL_Surface *g_screen_surface = nullptr;
 
 //Current displayed image
 SDL_Surface *gStretchedSurface = nullptr;
@@ -39,26 +39,25 @@ bool init() {
         success = false;
     } else {
         //Create window
-        gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                                   SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        if (gWindow == nullptr) {
+        g_window = SDL_CreateWindow("SDL Tutorial", SCREEN_WIDTH,SCREEN_HEIGHT, 0);
+        if (g_window == nullptr) {
             printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
             success = false;
         } else {
             //Get window surface
-            gScreenSurface = SDL_GetWindowSurface(gWindow);
+            g_screen_surface = SDL_GetWindowSurface(g_window);
         }
     }
 
     return success;
 }
 
-bool loadMedia() {
+bool load_media() {
     //Loading success flag
     bool success = true;
 
     //Load stretching surface
-    gStretchedSurface = loadSurface("stretch.bmp");
+    gStretchedSurface = load_surface("stretch.bmp");
     if (gStretchedSurface == nullptr) {
         printf("Failed to load stretching image!\n");
         success = false;
@@ -69,18 +68,18 @@ bool loadMedia() {
 
 void close() {
     //Free loaded image
-    SDL_FreeSurface(gStretchedSurface);
+    SDL_DestroySurface(gStretchedSurface);
     gStretchedSurface = nullptr;
 
     //Destroy window
-    SDL_DestroyWindow(gWindow);
-    gWindow = nullptr;
+    SDL_DestroyWindow(g_window);
+    g_window = nullptr;
 
     //Quit SDL subsystems
     SDL_Quit();
 }
 
-SDL_Surface *loadSurface(const std::string &path) {
+SDL_Surface *load_surface(const std::string &path) {
     //The final optimized image
     SDL_Surface *optimizedSurface = nullptr;
 
@@ -90,13 +89,13 @@ SDL_Surface *loadSurface(const std::string &path) {
         printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
     } else {
         //Convert surface to screen format
-        optimizedSurface = SDL_ConvertSurface(loadedSurface, gScreenSurface->format, 0);
+        optimizedSurface = SDL_ConvertSurface(loadedSurface, g_screen_surface->format);
         if (optimizedSurface == nullptr) {
             printf("Unable to optimize image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
         }
 
         //Get rid of old loaded surface
-        SDL_FreeSurface(loadedSurface);
+        SDL_DestroySurface(loadedSurface);
     }
 
     return optimizedSurface;
@@ -108,7 +107,7 @@ int main(int argc, char *args[]) {
         printf("Failed to initialize!\n");
     } else {
         //Load media
-        if (!loadMedia()) {
+        if (!load_media()) {
             printf("Failed to load media!\n");
         } else {
             //Main loop flag
@@ -122,17 +121,17 @@ int main(int argc, char *args[]) {
                 //Handle events on queue
                 while (SDL_PollEvent(&e) != 0) {
                     //User requests quit
-                    if (e.type == SDL_QUIT) {
+                    if (e.type == SDL_EVENT_QUIT) {
                         quit = true;
                     }
                 }
 
                 //Apply the image stretched
                 SDL_Rect stretchRect{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-                SDL_BlitScaled(gStretchedSurface, nullptr, gScreenSurface, &stretchRect);
+                SDL_BlitSurfaceScaled(gStretchedSurface, nullptr, g_screen_surface, &stretchRect, SDL_SCALEMODE_LINEAR);
 
                 //Update the surface
-                SDL_UpdateWindowSurface(gWindow);
+                SDL_UpdateWindowSurface(g_window);
             }
         }
     }

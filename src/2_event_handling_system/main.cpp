@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 constexpr int SCREEN_WIDTH = 640;
 constexpr int SCREEN_HEIGHT = 480;
@@ -23,11 +23,9 @@ bool init() {
         // Create window
         g_window = SDL_CreateWindow(
             "SDL Tutorial",
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
-            SDL_WINDOW_SHOWN);
+            0);
         if (g_window == nullptr) {
             printf("SDL_CreateWindow: %s\n", SDL_GetError());
             success = false;
@@ -55,7 +53,7 @@ bool load_media() {
 
 void close() {
     // Deallocate surface
-    SDL_FreeSurface(g_x_out);
+    SDL_DestroySurface(g_x_out);
     g_x_out = nullptr;
 
     // Destroy window
@@ -85,7 +83,7 @@ int main(int argc, char *argv[]) {
 
             while (quit == false) {
                 while (SDL_PollEvent(&event) != 0) {
-                    if (event.type == SDL_QUIT) {
+                    if (event.type == SDL_EVENT_QUIT) {
                         quit = true;
                     }
                 }

@@ -1,6 +1,7 @@
-# Use the SDL2 from the main project where it's fetched
-add_executable(1_hello_world main.cpp
-        ../2_event_handling_system/main.cpp)
+add_executable(1_hello_world main.cpp)
 
-# Link SDL2 directly without finding the package
-target_link_libraries(1_hello_world PRIVATE SDL2::SDL2)
+find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_image CONFIG REQUIRED)
+
+target_link_libraries(1_hello_world PRIVATE SDL3::SDL3)
+target_link_libraries(1_hello_world PRIVATE $<IF:$<TARGET_EXISTS:SDL3_image::SDL3_image-shared>,SDL3_image::SDL3_image-shared,SDL3_image::SDL3_image-static>)

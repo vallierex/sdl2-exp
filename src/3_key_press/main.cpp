@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
-#include <SDL.h>
+#include <SDL3/SDL.h>
 
 constexpr int SCREEN_WIDTH = 640;
 constexpr int SCREEN_HEIGHT = 480;
@@ -31,8 +31,7 @@ bool init() {
         success = false;
     } else {
         // Create window
-        g_window = SDL_CreateWindow("SDL Tutorial",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                                    SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        g_window = SDL_CreateWindow("SDL Tutorial", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
         if (g_window == nullptr) {
             printf("SDL_CreateWindow: %s\n", SDL_GetError());
             success = false;
@@ -47,7 +46,7 @@ bool init() {
 void close() {
     //Deallocate surfaces
     for (auto &i: g_key_press_surface) {
-        SDL_FreeSurface(i);
+        SDL_DestroySurface(i);
         i = nullptr;
     }
 
@@ -131,13 +130,13 @@ int main(int argc, char *argv[]) {
                 //Handle events on queue
                 while (SDL_PollEvent(&e) != 0) {
                     //User requests quit
-                    if (e.type == SDL_QUIT) {
+                    if (e.type == SDL_EVENT_QUIT) {
                         quit = true;
                     }
                     //User presses a key
-                    else if (e.type == SDL_KEYDOWN) {
+                    else if (e.type == SDL_EVENT_KEY_DOWN) {
                         //Select surfaces based on key press
-                        switch (e.key.keysym.sym) {
+                        switch (e.key.key) {
                             case SDLK_UP:
                                 current_surface = g_key_press_surface[KEY_PRESS_SURFACE_UP];
                                 break;
