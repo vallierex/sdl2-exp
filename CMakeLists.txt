@@ -20,3 +20,4 @@ set(CMAKE_PREFIX_PATH ${sdl2_SOURCE_DIR}/build/cmake)
 
 add_subdirectory(src/1_hello_world)
 add_subdirectory(src/2_event_handling_system)
+add_subdirectory(src/3_key_press)
